@@ -79,7 +79,7 @@
             $call = $this->getCall($index);
 
             $output .= $this->formatIndex($index, $call);
-            $output .= $call[0];
+            $output .= $this->formatCall($call);
             $output .= $this->formatCallEol($call);
         }
 
@@ -115,9 +115,15 @@
         if ($this->offsetInIndex) {
             return sprintf($this->indexFormat, $index, $call[2]);
         }
-        else {
-            return sprintf($this->indexFormat, $index);
-        }
+
+        return sprintf($this->indexFormat, $index);
+    }
+
+     /**
+     *
+     */
+    private function formatCall($call) {
+        return $call[0] == 'plugin' ? $call[1][0] : $call[0];
     }
 
     /**
