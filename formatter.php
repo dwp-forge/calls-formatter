@@ -11,6 +11,7 @@
 
     const OFFSET_AT_EOL = 1;
     const OFFSET_IN_INDEX = 2;
+    const START_WITH_NEW_LINE = 3;
 
     private $calls;
     private $style;
@@ -40,8 +41,8 @@
         }
 
         $this->style = $style;
-        $this->offsetAtEol = in_array(self::OFFSET_AT_EOL, $this->style);
-        $this->offsetInIndex = in_array(self::OFFSET_IN_INDEX, $this->style);
+        $this->offsetAtEol = $this->hasStyle(self::OFFSET_AT_EOL);
+        $this->offsetInIndex = $this->hasStyle(self::OFFSET_IN_INDEX);
 
         $offsetWidth = strlen(strval($this->calls[count($this->calls) - 1][2]));
 
@@ -67,7 +68,7 @@
             $this->setStyle($style);
         }
 
-        $output = "";
+        $output = $this->hasStyle(self::START_WITH_NEW_LINE) ? "\n" : '';
 
         foreach ($this->calls as $index => $call) {
             $output .= $this->formatIndex($index, $call);
@@ -76,6 +77,13 @@
         }
 
         return $output;
+    }
+
+    /**
+     *
+     */
+    private function hasStyle($style) {
+        return in_array($style, $this->style);
     }
 
     /**
@@ -102,6 +110,7 @@ function format_calls($calls) {
     $formatter = new DokuwikiCallsFormatter($calls);
 
     return $formatter->format(
+        DokuwikiCallsFormatter::START_WITH_NEW_LINE,
         DokuwikiCallsFormatter::OFFSET_AT_EOL
     );
 }
