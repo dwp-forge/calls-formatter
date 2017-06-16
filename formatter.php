@@ -9,14 +9,17 @@
 
  class DokuwikiCallsFormatter {
 
-    const OFFSET_AT_EOL = 1;
-    const OFFSET_IN_INDEX = 2;
-    const START_WITH_NEW_LINE = 3;
+    const COLLAPSE_DATA_PARAGRAPHS = 0x98f1f81d;
+    const OFFSET_AT_EOL = 0x52de62ad;
+    const OFFSET_IN_INDEX = 0x7266e39e;
+    const START_WITH_NEW_LINE = 0x2e0a6907;
 
     private $calls;
+    private $count;
     private $style;
     private $indexWidth;
     private $indexFormat;
+    private $collapseDataParagraphs;
     private $offsetAtEol;
     private $offsetInIndex;
 
@@ -25,7 +28,8 @@
      */
     public function __construct($calls) {
         $this->calls = $calls;
-        $this->indexWidth = strlen(strval(count($this->calls)));
+        $this->count = count($this->calls);
+        $this->indexWidth = strlen(strval($this->count));
 
         $this->setStyle(array());
     }
@@ -41,6 +45,7 @@
         }
 
         $this->style = $style;
+        $this->collapseDataParagraphs = $this->hasStyle(self::COLLAPSE_DATA_PARAGRAPHS);
         $this->offsetAtEol = $this->hasStyle(self::OFFSET_AT_EOL);
         $this->offsetInIndex = $this->hasStyle(self::OFFSET_IN_INDEX);
 
@@ -70,7 +75,9 @@
 
         $output = $this->hasStyle(self::START_WITH_NEW_LINE) ? "\n" : '';
 
-        foreach ($this->calls as $index => $call) {
+        for ($index = 0; $index < $this->count; $index += isset($call[3]) ? $call[3] : 1) {
+            $call = $this->getCall($index);
+
             $output .= $this->formatIndex($index, $call);
             $output .= $call[0];
             $output .= $this->formatCallEol($call);
@@ -84,6 +91,21 @@
      */
     private function hasStyle($style) {
         return in_array($style, $this->style);
+    }
+
+    /**
+     *
+     */
+    private function getCall($index) {
+        $call = $this->calls[$index];
+
+        if ($call[0] == 'p_open' && $this->collapseDataParagraphs && $index + 2 < $this->count &&
+                $this->calls[$index + 1][0] == 'cdata' && $this->calls[$index + 2][0] == 'p_close') {
+            $call[0] = 'p_cdata';
+            $call[3] = 3;
+        }
+
+        return $call;
     }
 
     /**
@@ -111,6 +133,7 @@ function format_calls($calls) {
 
     return $formatter->format(
         DokuwikiCallsFormatter::START_WITH_NEW_LINE,
+        DokuwikiCallsFormatter::COLLAPSE_DATA_PARAGRAPHS,
         DokuwikiCallsFormatter::OFFSET_AT_EOL
     );
 }
