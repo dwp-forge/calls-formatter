@@ -10,6 +10,7 @@
  class DokuwikiCallsFormatter {
 
     const COLLAPSE_DATA_PARAGRAPHS = 0x98f1f81d;
+    const HIDE_INDEX = 0xebefe439;
     const OFFSET_AT_EOL = 0x52de62ad;
     const OFFSET_IN_INDEX = 0x7266e39e;
     const START_WITH_NEW_LINE = 0x2e0a6907;
@@ -20,6 +21,7 @@
     private $indexWidth;
     private $indexFormat;
     private $collapseDataParagraphs;
+    private $hideIndex;
     private $offsetAtEol;
     private $offsetInIndex;
 
@@ -45,6 +47,7 @@
         }
 
         $this->style = $style;
+        $this->hideIndex = $this->hasStyle(self::HIDE_INDEX);
         $this->collapseDataParagraphs = $this->hasStyle(self::COLLAPSE_DATA_PARAGRAPHS);
         $this->offsetAtEol = $this->hasStyle(self::OFFSET_AT_EOL);
         $this->offsetInIndex = $this->hasStyle(self::OFFSET_IN_INDEX);
@@ -112,6 +115,10 @@
      *
      */
     private function formatIndex($index, $call) {
+        if ($this->hideIndex) {
+            return '';
+        }
+
         if ($this->offsetInIndex) {
             return sprintf($this->indexFormat, $index, $call[2]);
         }
