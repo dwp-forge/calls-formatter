@@ -10,11 +10,14 @@
  class DokuwikiCallsFormatter {
 
     const COLLAPSE_DATA_PARAGRAPHS = 0x98f1f81d;
+    const COMPACT_DATA = 0x6724fd87;
     const HIDE_DATA = 0x5a213f13;
     const HIDE_INDEX = 0xebefe439;
     const OFFSET_AT_EOL = 0x52de62ad;
     const OFFSET_IN_INDEX = 0x7266e39e;
     const START_WITH_NEW_LINE = 0x2e0a6907;
+
+    const MAX_COMPACT_STRING_LENGTH = 30;
 
     private $calls;
     private $count;
@@ -24,6 +27,7 @@
     private $dataIndent;
     private $dataIndexFormat;
     private $collapseDataParagraphs;
+    private $compactData;
     private $hideData;
     private $hideIndex;
     private $offsetAtEol;
@@ -51,9 +55,10 @@
         }
 
         $this->style = $style;
+        $this->collapseDataParagraphs = $this->hasStyle(self::COLLAPSE_DATA_PARAGRAPHS);
+        $this->compactData = $this->hasStyle(self::COMPACT_DATA);
         $this->hideData = $this->hasStyle(self::HIDE_DATA);
         $this->hideIndex = $this->hasStyle(self::HIDE_INDEX);
-        $this->collapseDataParagraphs = $this->hasStyle(self::COLLAPSE_DATA_PARAGRAPHS);
         $this->offsetAtEol = $this->hasStyle(self::OFFSET_AT_EOL);
         $this->offsetInIndex = $this->hasStyle(self::OFFSET_IN_INDEX);
 
@@ -167,13 +172,69 @@
 
         $data = '';
 
-        foreach ($call[1] as $index => $value) {
-            $data .= sprintf($this->dataIndexFormat, $index);
-            $data .= str_replace("\n", "\n" . $this->dataIndent, rtrim(print_r($value, true)));
+        if ($this->compactData) {
+            $data .= $this->dataIndent;
+            $data .= $this->formatArrayCompact($call[1]);
             $data .= "\n";
+        }
+        else {
+            foreach ($call[1] as $index => $value) {
+                $data .= sprintf($this->dataIndexFormat, $index);
+                $data .= str_replace("\n", "\n" . $this->dataIndent, rtrim(print_r($value, true)));
+                $data .= "\n";
+            }
         }
 
         return $data;
+    }
+
+    /**
+     *
+     */
+    private function formatValueCompact($value) {
+        if (is_string($value)) {
+            return $this->formatStringCompact($value);
+        }
+        else if (is_array($value)) {
+            return '{' . $this->formatArrayCompact($value) . '}';
+        }
+
+        return strval($value);
+    }
+
+    /**
+     *
+     */
+    private function formatStringCompact($string) {
+        $output = trim(str_replace("\n", '\n', $string));
+
+        if (strlen($output) > self::MAX_COMPACT_STRING_LENGTH) {
+            $output = substr($output, 0, self::MAX_COMPACT_STRING_LENGTH - 3) . '...';
+        }
+
+        return '"' . $output . '"';
+    }
+
+    /**
+     *
+     */
+    private function formatArrayCompact($array) {
+        $output = '';
+        $first = true;
+
+        foreach ($array as $key => $value) {
+            if ($first) {
+                $first = false;
+            }
+            else {
+                $output .= ', ';
+            }
+
+            $output .= "[$key] => ";
+            $output .= $this->formatValueCompact($value);
+        }
+
+        return $output;
     }
 }
 
