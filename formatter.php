@@ -10,6 +10,7 @@
  class DokuwikiCallsFormatter {
 
     const COLLAPSE_DATA_PARAGRAPHS = 0x98f1f81d;
+    const HIDE_DATA = 0x5a213f13;
     const HIDE_INDEX = 0xebefe439;
     const OFFSET_AT_EOL = 0x52de62ad;
     const OFFSET_IN_INDEX = 0x7266e39e;
@@ -20,7 +21,10 @@
     private $style;
     private $indexWidth;
     private $indexFormat;
+    private $dataIndent;
+    private $dataIndexFormat;
     private $collapseDataParagraphs;
+    private $hideData;
     private $hideIndex;
     private $offsetAtEol;
     private $offsetInIndex;
@@ -47,6 +51,7 @@
         }
 
         $this->style = $style;
+        $this->hideData = $this->hasStyle(self::HIDE_DATA);
         $this->hideIndex = $this->hasStyle(self::HIDE_INDEX);
         $this->collapseDataParagraphs = $this->hasStyle(self::COLLAPSE_DATA_PARAGRAPHS);
         $this->offsetAtEol = $this->hasStyle(self::OFFSET_AT_EOL);
@@ -60,6 +65,16 @@
         else {
             $this->indexFormat = '[%' . $this->indexWidth . 'd] ';
         }
+
+        if ($this->hideIndex) {
+            $dataIndent = 4;
+        }
+        else {
+            $dataIndent = $this->indexWidth + ($this->offsetInIndex ? $offsetWidth + 6 : 3);
+        }
+
+        $this->dataIndent = str_pad('', $dataIndent);
+        $this->dataIndexFormat = $this->dataIndent . '[%d] => ';
     }
 
     /**
@@ -84,6 +99,7 @@
             $output .= $this->formatIndex($index, $call);
             $output .= $this->formatCall($call);
             $output .= $this->formatCallEol($call);
+            $output .= $this->formatCallData($call);
         }
 
         return $output;
@@ -105,6 +121,7 @@
         if ($call[0] == 'p_open' && $this->collapseDataParagraphs && $index + 2 < $this->count &&
                 $this->calls[$index + 1][0] == 'cdata' && $this->calls[$index + 2][0] == 'p_close') {
             $call[0] = 'p_cdata';
+            $call[1] = $this->calls[$index + 1][1];
             $call[3] = 3;
         }
 
@@ -138,6 +155,25 @@
      */
     private function formatCallEol($call) {
         return $this->offsetAtEol ? ' @ ' . $call[2] . "\n" : "\n";
+    }
+
+    /**
+     *
+     */
+    private function formatCallData($call) {
+        if ($this->hideData || empty($call[1])) {
+            return '';
+        }
+
+        $data = '';
+
+        foreach ($call[1] as $index => $value) {
+            $data .= sprintf($this->dataIndexFormat, $index);
+            $data .= str_replace("\n", "\n" . $this->dataIndent, rtrim(print_r($value, true)));
+            $data .= "\n";
+        }
+
+        return $data;
     }
 }
 
