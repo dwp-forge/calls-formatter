@@ -88,11 +88,11 @@ class DokuwikiGenericCallFormatter {
     /**
      *
      */
-    protected function formatStringCompact($string) {
+    protected function formatStringCompact($string, $maxLength = DokuwikiCallsStyle::MAX_COMPACT_STRING_LENGTH) {
         $output = trim(str_replace("\n", '\n', $string));
 
-        if (strlen($output) > DokuwikiCallsStyle::MAX_COMPACT_STRING_LENGTH) {
-            $output = substr($output, 0, DokuwikiCallsStyle::MAX_COMPACT_STRING_LENGTH - 3) . '...';
+        if (strlen($output) > $maxLength) {
+            $output = substr($output, 0, $maxLength - 3) . '...';
         }
 
         return '"' . $output . '"';

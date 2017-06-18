@@ -7,7 +7,7 @@
  * @author     Mykola Ostrovskyy <dwpforge@gmail.com>
  */
 
-require_once('generic.php');
+require_once('basic.php');
 require_once('style.php');
 
 class DokuwikiCallsFormatter {
@@ -15,6 +15,7 @@ class DokuwikiCallsFormatter {
     private $calls;
     private $count;
     private $style;
+    private $formatter;
     private $genericCallFormatter;
 
     /**
@@ -24,6 +25,11 @@ class DokuwikiCallsFormatter {
         $this->calls = $calls;
         $this->count = count($this->calls);
         $this->style = new DokuwikiCallsStyle($this->count);
+        $this->formatter = array(
+            'cdata' => new DokuwikiCdataCallFormatter($this->style),
+            'header' => new DokuwikiHeaderCallFormatter($this->style),
+            'p_cdata' => new DokuwikiCdataCallFormatter($this->style)
+        );
         $this->genericCallFormatter = new DokuwikiGenericCallFormatter($this->style);
     }
 
@@ -100,6 +106,10 @@ class DokuwikiCallsFormatter {
      *
      */
     private function formatCall($call) {
+        if (array_key_exists($call[0], $this->formatter)) {
+            return $this->formatter[$call[0]]->format($call);
+        }
+
         return $this->genericCallFormatter->format($call);
     }
 }
