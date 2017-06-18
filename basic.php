@@ -13,22 +13,9 @@ class DokuwikiCdataCallFormatter extends DokuwikiGenericCallFormatter {
     /**
      *
      */
-    protected function formatCall($call) {
-        $output = parent::formatCall($call);
-
-        if ($this->style->getCompactData()) {
-            $output .= ' ' . $this->formatStringCompact($call[1][0], 50);
-        }
-
-        return $output;
-    }
-
-    /**
-     *
-     */
     protected function formatCallData($call) {
-        if ($this->style->getCompactData()) {
-            return '';
+        if ($this->style->getInlineData()) {
+            return ' ' . $this->formatStringCompact($call[1][0], 50);
         }
 
         return $this->style->getDataIndent() . $this->formatStringCompact($call[1][0], 80) . "\n";
@@ -39,22 +26,9 @@ class DokuwikiHeaderCallFormatter extends DokuwikiGenericCallFormatter {
     /**
      *
      */
-    protected function formatCall($call) {
-        $output = parent::formatCall($call);
-
-        if ($this->style->getCompactData()) {
-            $output .= ' ' . $this->formatData($call);
-        }
-
-        return $output;
-    }
-
-    /**
-     *
-     */
     protected function formatCallData($call) {
-        if ($this->style->getCompactData()) {
-            return '';
+        if ($this->style->getInlineData()) {
+            return ' ' . $this->formatData($call);
         }
 
         return $this->style->getDataIndent() . $this->formatData($call) . "\n";
@@ -64,6 +38,9 @@ class DokuwikiHeaderCallFormatter extends DokuwikiGenericCallFormatter {
      *
      */
     private function formatData($call) {
-        return $this->formatStringCompact($call[1][0]) . ', level = ' . $call[1][1];
+        $maxTitleLength = $this->style->getInlineData() ? 40 : 80;
+
+        return $this->formatStringCompact($call[1][0], $maxTitleLength) . $this->style->getDataSeparator() .
+            'level = ' . $call[1][1];
     }
 }

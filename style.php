@@ -11,6 +11,7 @@ class DokuwikiCallsStyle {
 
     const COLLAPSE_DATA_PARAGRAPHS = 0x98f1f81d;
     const COMPACT_DATA = 0x6724fd87;
+    const INLINE_DATA = 0x0345846a;
     const HIDE_DATA = 0x5a213f13;
     const HIDE_INDEX = 0xebefe439;
     const OFFSET_AT_EOL = 0x52de62ad;
@@ -25,9 +26,11 @@ class DokuwikiCallsStyle {
     private $indexFormat;
     private $dataIndent;
     private $dataIndexFormat;
+    private $dataSeparator;
 
     private $collapseDataParagraphs;
     private $compactData;
+    private $inlineData;
     private $hideData;
     private $hideIndex;
     private $offsetAtEol;
@@ -54,7 +57,8 @@ class DokuwikiCallsStyle {
 
         $this->style = $style;
         $this->collapseDataParagraphs = $this->has(self::COLLAPSE_DATA_PARAGRAPHS);
-        $this->compactData = $this->has(self::COMPACT_DATA);
+        $this->compactData = $this->has(self::COMPACT_DATA) || $this->has(self::INLINE_DATA);
+        $this->inlineData = $this->has(self::INLINE_DATA);
         $this->hideData = $this->has(self::HIDE_DATA);
         $this->hideIndex = $this->has(self::HIDE_INDEX);
         $this->offsetAtEol = $this->has(self::OFFSET_AT_EOL);
@@ -78,6 +82,7 @@ class DokuwikiCallsStyle {
 
         $this->dataIndent = str_pad('', $dataIndent);
         $this->dataIndexFormat = $this->dataIndent . '[%d] => ';
+        $this->dataSeparator = $this->compactData ? ', ' : "\n" . $this->dataIndent;
     }
 
     /**
@@ -118,6 +123,13 @@ class DokuwikiCallsStyle {
     /**
      *
      */
+    public function getDataSeparator() {
+        return $this->dataSeparator;
+    }
+
+    /**
+     *
+     */
     public function getCollapseDataParagraphs() {
         return $this->collapseDataParagraphs;
     }
@@ -127,6 +139,13 @@ class DokuwikiCallsStyle {
      */
     public function getCompactData() {
         return $this->compactData;
+    }
+
+    /**
+     *
+     */
+    public function getInlineData() {
+        return $this->inlineData;
     }
 
     /**

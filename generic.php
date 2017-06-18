@@ -26,10 +26,18 @@ class DokuwikiGenericCallFormatter {
      * @param $call Call data array.
      */
     public function format($call) {
-        $output = $this->formatCall($call) . $this->formatCallEol($call);
+        $output = $this->formatCall($call);
+
+        if (!$this->style->getInlineData()) {
+            $output .= $this->formatCallEol($call);
+        }
 
         if (!$this->style->getHideData() && !empty($call[1])) {
             $output .= $this->formatCallData($call);
+        }
+
+        if ($this->style->getInlineData()) {
+            $output .= $this->formatCallEol($call);
         }
 
         return $output;
@@ -55,7 +63,12 @@ class DokuwikiGenericCallFormatter {
     protected function formatCallData($call) {
         $data = '';
 
-        if ($this->style->getCompactData()) {
+        if ($this->style->getInlineData()) {
+            $data .= ' {';
+            $data .= $this->formatArrayCompact($call[1]);
+            $data .= '}';
+        }
+        elseif ($this->style->getCompactData()) {
             $data .= $this->style->getDataIndent();
             $data .= $this->formatArrayCompact($call[1]);
             $data .= "\n";
