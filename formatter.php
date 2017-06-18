@@ -7,13 +7,15 @@
  * @author     Mykola Ostrovskyy <dwpforge@gmail.com>
  */
 
+require_once('generic.php');
 require_once('style.php');
 
- class DokuwikiCallsFormatter {
+class DokuwikiCallsFormatter {
 
     private $calls;
     private $count;
     private $style;
+    private $genericCallFormatter;
 
     /**
      * Constructor
@@ -22,6 +24,7 @@ require_once('style.php');
         $this->calls = $calls;
         $this->count = count($this->calls);
         $this->style = new DokuwikiCallsStyle($this->count);
+        $this->genericCallFormatter = new DokuwikiGenericCallFormatter($this->style);
     }
 
     /**
@@ -56,10 +59,11 @@ require_once('style.php');
         for ($index = 0; $index < $this->count; $index += isset($call[3]) ? $call[3] : 1) {
             $call = $this->getCall($index);
 
-            $output .= $this->formatIndex($index, $call);
+            if (!$this->style->getHideIndex()) {
+                $output .= $this->formatIndex($index, $call);
+            }
+
             $output .= $this->formatCall($call);
-            $output .= $this->formatCallEol($call);
-            $output .= $this->formatCallData($call);
         }
 
         return $output;
@@ -85,10 +89,6 @@ require_once('style.php');
      *
      */
     private function formatIndex($index, $call) {
-        if ($this->style->getHideIndex()) {
-            return '';
-        }
-
         if ($this->style->getOffsetInIndex()) {
             return sprintf($this->style->getIndexFormat(), $index, $call[2]);
         }
@@ -96,93 +96,11 @@ require_once('style.php');
         return sprintf($this->style->getIndexFormat(), $index);
     }
 
-     /**
+    /**
      *
      */
     private function formatCall($call) {
-        return $call[0] == 'plugin' ? $call[1][0] : $call[0];
-    }
-
-    /**
-     *
-     */
-    private function formatCallEol($call) {
-        return $this->style->getOffsetAtEol() ? ' @ ' . $call[2] . "\n" : "\n";
-    }
-
-    /**
-     *
-     */
-    private function formatCallData($call) {
-        if ($this->style->getHideData() || empty($call[1])) {
-            return '';
-        }
-
-        $data = '';
-
-        if ($this->style->getCompactData()) {
-            $data .= $this->style->getDataIndent();
-            $data .= $this->formatArrayCompact($call[1]);
-            $data .= "\n";
-        }
-        else {
-            foreach ($call[1] as $index => $value) {
-                $data .= sprintf($this->style->getDataIndexFormat(), $index);
-                $data .= str_replace("\n", "\n" . $this->style->getDataIndent(), rtrim(print_r($value, true)));
-                $data .= "\n";
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     *
-     */
-    private function formatValueCompact($value) {
-        if (is_string($value)) {
-            return $this->formatStringCompact($value);
-        }
-        else if (is_array($value)) {
-            return '{' . $this->formatArrayCompact($value) . '}';
-        }
-
-        return strval($value);
-    }
-
-    /**
-     *
-     */
-    private function formatStringCompact($string) {
-        $output = trim(str_replace("\n", '\n', $string));
-
-        if (strlen($output) > DokuwikiCallsStyle::MAX_COMPACT_STRING_LENGTH) {
-            $output = substr($output, 0, DokuwikiCallsStyle::MAX_COMPACT_STRING_LENGTH - 3) . '...';
-        }
-
-        return '"' . $output . '"';
-    }
-
-    /**
-     *
-     */
-    private function formatArrayCompact($array) {
-        $output = '';
-        $first = true;
-
-        foreach ($array as $key => $value) {
-            if ($first) {
-                $first = false;
-            }
-            else {
-                $output .= ', ';
-            }
-
-            $output .= "[$key] => ";
-            $output .= $this->formatValueCompact($value);
-        }
-
-        return $output;
+        return $this->genericCallFormatter->format($call);
     }
 }
 

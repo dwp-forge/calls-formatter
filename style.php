@@ -7,7 +7,7 @@
  * @author     Mykola Ostrovskyy <dwpforge@gmail.com>
  */
 
- class DokuwikiCallsStyle {
+class DokuwikiCallsStyle {
 
     const COLLAPSE_DATA_PARAGRAPHS = 0x98f1f81d;
     const COMPACT_DATA = 0x6724fd87;
