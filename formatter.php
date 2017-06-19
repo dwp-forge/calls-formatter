@@ -8,6 +8,7 @@
  */
 
 require_once('basic.php');
+require_once('plugin_qna.php');
 require_once('style.php');
 
 class DokuwikiCallsFormatter {
