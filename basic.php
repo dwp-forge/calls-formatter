@@ -10,6 +10,25 @@
 require_once('generic.php');
 require_once('formatter.php');
 
+class DokuwikiPopenCallProcessor extends DokuwikiGenericCallProcessor {
+    /**
+     *
+     */
+    public function getCall($calls, $index) {
+        $call = $calls[$index];
+
+        if ($this->style->getCollapseDataParagraphs() && $index + 2 < count($calls) &&
+                $calls[$index + 1][0] == 'cdata' && $calls[$index + 2][0] == 'p_close') {
+            $call[0] = 'p_cdata';
+            $call[1] = $calls[$index + 1][1];
+
+            return array($call, 3);
+        }
+
+        return array($call, 1);
+    }
+}
+
 class DokuwikiCdataCallFormatter extends DokuwikiGenericCallFormatter {
     /**
      *
@@ -45,6 +64,8 @@ class DokuwikiHeaderCallFormatter extends DokuwikiGenericCallFormatter {
             'level = ' . $call[1][1];
     }
 }
+
+DokuwikiCallsFormatter::registerProcessor('p_open', 'DokuwikiPopenCallProcessor');
 
 DokuwikiCallsFormatter::registerFormatter('cdata', 'DokuwikiCdataCallFormatter');
 DokuwikiCallsFormatter::registerFormatter('header', 'DokuwikiHeaderCallFormatter');
