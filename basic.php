@@ -8,6 +8,7 @@
  */
 
 require_once('generic.php');
+require_once('formatter.php');
 
 class DokuwikiCdataCallFormatter extends DokuwikiGenericCallFormatter {
     /**
@@ -44,3 +45,7 @@ class DokuwikiHeaderCallFormatter extends DokuwikiGenericCallFormatter {
             'level = ' . $call[1][1];
     }
 }
+
+DokuwikiCallsFormatter::registerFormatter('cdata', 'DokuwikiCdataCallFormatter');
+DokuwikiCallsFormatter::registerFormatter('header', 'DokuwikiHeaderCallFormatter');
+DokuwikiCallsFormatter::registerFormatter('p_cdata', 'DokuwikiCdataCallFormatter');

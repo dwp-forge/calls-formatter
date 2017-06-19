@@ -12,25 +12,35 @@ require_once('style.php');
 
 class DokuwikiCallsFormatter {
 
+    private static $formatterClasses = array();
+
     private $calls;
     private $count;
     private $style;
-    private $formatter;
+    private $callFormatters;
     private $genericCallFormatter;
 
     /**
+     * Registers a call formatter for a given mode.
+     *
+     * @param $mode Mode name.
+     * @param $formatterClass Formatter class name.
+     */
+    public static function registerFormatter($mode, $formatterClass) {
+        self::$formatterClasses[$mode] = $formatterClass;
+    }
+
+    /**
      * Constructor
+     *
+     * @param $calls Calls array.
      */
     public function __construct($calls) {
         $this->calls = $calls;
         $this->count = count($this->calls);
         $this->style = new DokuwikiCallsStyle($this->count);
-        $this->formatter = array(
-            'cdata' => new DokuwikiCdataCallFormatter($this->style),
-            'header' => new DokuwikiHeaderCallFormatter($this->style),
-            'p_cdata' => new DokuwikiCdataCallFormatter($this->style)
-        );
-        $this->genericCallFormatter = new DokuwikiGenericCallFormatter($this->style);
+
+        $this->initCallFormatters();
     }
 
     /**
@@ -78,6 +88,23 @@ class DokuwikiCallsFormatter {
     /**
      *
      */
+    private function initCallFormatters() {
+        $callFormatters = array();
+        $this->callFormatters = array();
+        $this->genericCallFormatter = new DokuwikiGenericCallFormatter($this->style);
+
+        foreach (self::$formatterClasses as $mode => $class) {
+            if (!array_key_exists($class, $callFormatters)) {
+                $callFormatters[$class] = new $class($this->style);
+            }
+
+            $this->callFormatters[$mode] = $callFormatters[$class];
+        }
+    }
+
+    /**
+     *
+     */
     private function getCall($index) {
         $call = $this->calls[$index];
 
@@ -106,8 +133,8 @@ class DokuwikiCallsFormatter {
      *
      */
     private function formatCall($call) {
-        if (array_key_exists($call[0], $this->formatter)) {
-            return $this->formatter[$call[0]]->format($call);
+        if (array_key_exists($call[0], $this->callFormatters)) {
+            return $this->callFormatters[$call[0]]->format($call);
         }
 
         return $this->genericCallFormatter->format($call);
