@@ -14,7 +14,9 @@ class DokuwikiGenericCallFormatter {
     protected $style;
 
     /**
-     * Constructor
+     * Constructor.
+     *
+     * @param $style Style object.
      */
     public function __construct($style) {
         $this->style = $style;
@@ -135,5 +137,47 @@ class DokuwikiGenericCallFormatter {
         }
 
         return $output;
+    }
+}
+
+class DokuwikiModeHandlerFactory {
+
+    private $handlers;
+    private $genericHandler;
+
+    /**
+     * Constructor.
+     *
+     * @param $classes Map from mode name to handler class name.
+     * @param $genericHandlerClass Class name of generic handler.
+     * @param $style Style object.
+     */
+    public function __construct($classes, $genericClass, $style) {
+        $handlers = array();
+        $this->handlers = array();
+
+        foreach ($classes as $mode => $class) {
+            if (!array_key_exists($class, $handlers)) {
+                $handlers[$class] = new $class($style);
+            }
+
+            $this->handlers[$mode] = $handlers[$class];
+        }
+
+        $this->genericHandler = new $genericClass($style);
+    }
+
+    /**
+     * Returns a handler for a mode.
+     *
+     * @param $mode Mode name.
+     * @return Mode-specific handler or a generic one if there none registered for the mode.
+     */
+    public function get($mode) {
+        if (array_key_exists($mode, $this->handlers)) {
+            return $this->handlers[$mode];
+        }
+
+        return $this->genericHandler;
     }
 }

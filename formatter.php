@@ -18,7 +18,6 @@ class DokuwikiCallsFormatter {
     private $count;
     private $style;
     private $callFormatters;
-    private $genericCallFormatter;
 
     /**
      * Registers a call formatter for a given mode.
@@ -39,8 +38,7 @@ class DokuwikiCallsFormatter {
         $this->calls = $calls;
         $this->count = count($this->calls);
         $this->style = new DokuwikiCallsStyle($this->count);
-
-        $this->initCallFormatters();
+        $this->callFormatters = new DokuwikiModeHandlerFactory(self::$formatterClasses, 'DokuwikiGenericCallFormatter', $this->style);
     }
 
     /**
@@ -88,23 +86,6 @@ class DokuwikiCallsFormatter {
     /**
      *
      */
-    private function initCallFormatters() {
-        $callFormatters = array();
-        $this->callFormatters = array();
-        $this->genericCallFormatter = new DokuwikiGenericCallFormatter($this->style);
-
-        foreach (self::$formatterClasses as $mode => $class) {
-            if (!array_key_exists($class, $callFormatters)) {
-                $callFormatters[$class] = new $class($this->style);
-            }
-
-            $this->callFormatters[$mode] = $callFormatters[$class];
-        }
-    }
-
-    /**
-     *
-     */
     private function getCall($index) {
         $call = $this->calls[$index];
 
@@ -133,11 +114,7 @@ class DokuwikiCallsFormatter {
      *
      */
     private function formatCall($call) {
-        if (array_key_exists($call[0], $this->callFormatters)) {
-            return $this->callFormatters[$call[0]]->format($call);
-        }
-
-        return $this->genericCallFormatter->format($call);
+        return $this->callFormatters->get($call[0])->format($call);
     }
 }
 
