@@ -13,11 +13,13 @@ require_once('style.php');
 class DokuwikiCallsFormatter {
 
     private static $formatterClasses = array();
+    private static $processorClasses = array();
 
     private $calls;
     private $count;
     private $style;
     private $callFormatters;
+    private $callProcessors;
 
     /**
      * Registers a call formatter for a given mode.
@@ -30,6 +32,16 @@ class DokuwikiCallsFormatter {
     }
 
     /**
+     * Registers a call processor for a given mode.
+     *
+     * @param $mode Mode name.
+     * @param $processorClass Processor class name.
+     */
+    public static function registerProcessor($mode, $processorClass) {
+        self::$processorClasses[$mode] = $processorClass;
+    }
+
+    /**
      * Constructor
      *
      * @param $calls Calls array.
@@ -39,6 +51,7 @@ class DokuwikiCallsFormatter {
         $this->count = count($this->calls);
         $this->style = new DokuwikiCallsStyle($this->count);
         $this->callFormatters = new DokuwikiModeHandlerFactory(self::$formatterClasses, 'DokuwikiGenericCallFormatter', $this->style);
+        $this->callProcessors = new DokuwikiModeHandlerFactory(self::$processorClasses, 'DokuwikiGenericCallProcessor', $this->style);
     }
 
     /**
@@ -70,8 +83,8 @@ class DokuwikiCallsFormatter {
 
         $output = $this->style->has(DokuwikiCallsStyle::START_WITH_NEW_LINE) ? "\n" : '';
 
-        for ($index = 0; $index < $this->count; $index += isset($call[3]) ? $call[3] : 1) {
-            $call = $this->getCall($index);
+        for ($index = 0; $index < $this->count; $index += $progress) {
+            list($call, $progress) = $this->getCall($index);
 
             if (!$this->style->getHideIndex()) {
                 $output .= $this->formatIndex($index, $call);
@@ -87,16 +100,7 @@ class DokuwikiCallsFormatter {
      *
      */
     private function getCall($index) {
-        $call = $this->calls[$index];
-
-        if ($call[0] == 'p_open' && $this->style->getCollapseDataParagraphs() && $index + 2 < $this->count &&
-                $this->calls[$index + 1][0] == 'cdata' && $this->calls[$index + 2][0] == 'p_close') {
-            $call[0] = 'p_cdata';
-            $call[1] = $this->calls[$index + 1][1];
-            $call[3] = 3;
-        }
-
-        return $call;
+        return $this->callProcessors->get($this->calls[$index][0])->getCall($this->calls, $index);
     }
 
     /**

@@ -9,6 +9,34 @@
 
 require_once('style.php');
 
+class DokuwikiGenericCallProcessor {
+
+    protected $style;
+
+    /**
+     * Constructor.
+     *
+     * @param $style Style object.
+     */
+    public function __construct($style) {
+        $this->style = $style;
+    }
+
+    /**
+     * Returns call at given index.
+     *
+     * Allows to customize processing (merging) of multiple calls. The number of
+     * handled calls should be returned as the second return value.
+     *
+     * @param $calls Calls array.
+     * @param $index Index of the call.
+     * @return Call data and number of processed calls.
+     */
+    public function getCall($calls, $index) {
+        return array($calls[$index], 1);
+    }
+}
+
 class DokuwikiGenericCallFormatter {
 
     protected $style;
