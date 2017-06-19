@@ -100,7 +100,7 @@ class DokuwikiCallsFormatter {
      *
      */
     private function getCall($index) {
-        return $this->callProcessors->get($this->calls[$index][0])->getCall($this->calls, $index);
+        return $this->callProcessors->get($this->calls[$index])->getCall($this->calls, $index);
     }
 
     /**
@@ -118,7 +118,7 @@ class DokuwikiCallsFormatter {
      *
      */
     private function formatCall($call) {
-        return $this->callFormatters->get($call[0])->format($call);
+        return $this->callFormatters->get($call)->format($call);
     }
 }
 

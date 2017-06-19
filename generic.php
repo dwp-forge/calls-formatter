@@ -198,10 +198,16 @@ class DokuwikiModeHandlerFactory {
     /**
      * Returns a handler for a mode.
      *
-     * @param $mode Mode name.
+     * @param $call Call data.
      * @return Mode-specific handler or a generic one if there none registered for the mode.
      */
-    public function get($mode) {
+    public function get($call) {
+        $mode = $call[0];
+
+        if ($mode == 'plugin') {
+            $mode .= ':' . $call[1][0];
+        }
+
         if (array_key_exists($mode, $this->handlers)) {
             return $this->handlers[$mode];
         }
