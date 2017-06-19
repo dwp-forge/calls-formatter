@@ -61,6 +61,10 @@ class DokuwikiGenericCallFormatter {
      *
      */
     protected function formatCallData($call) {
+        if ($this->style->getHideUnknownCallData()) {
+            return '';
+        }
+
         $data = '';
 
         if ($this->style->getInlineData()) {

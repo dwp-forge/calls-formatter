@@ -14,6 +14,7 @@ class DokuwikiCallsStyle {
     const INLINE_DATA = 0x0345846a;
     const HIDE_DATA = 0x5a213f13;
     const HIDE_INDEX = 0xebefe439;
+    const HIDE_UNKNOWN_CALL_DATA = 0x3604171e;
     const OFFSET_AT_EOL = 0x52de62ad;
     const OFFSET_IN_INDEX = 0x7266e39e;
     const START_WITH_NEW_LINE = 0x2e0a6907;
@@ -33,6 +34,7 @@ class DokuwikiCallsStyle {
     private $inlineData;
     private $hideData;
     private $hideIndex;
+    private $hideUnknownCallData;
     private $offsetAtEol;
     private $offsetInIndex;
 
@@ -61,6 +63,7 @@ class DokuwikiCallsStyle {
         $this->inlineData = $this->has(self::INLINE_DATA);
         $this->hideData = $this->has(self::HIDE_DATA);
         $this->hideIndex = $this->has(self::HIDE_INDEX);
+        $this->hideUnknownCallData = $this->has(self::HIDE_UNKNOWN_CALL_DATA);
         $this->offsetAtEol = $this->has(self::OFFSET_AT_EOL);
         $this->offsetInIndex = $this->has(self::OFFSET_IN_INDEX);
 
@@ -160,6 +163,13 @@ class DokuwikiCallsStyle {
      */
     public function getHideIndex() {
         return $this->hideIndex;
+    }
+
+    /**
+     *
+     */
+    public function getHideUnknownCallData() {
+        return $this->hideUnknownCallData;
     }
 
     /**
