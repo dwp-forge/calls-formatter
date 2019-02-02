@@ -24,6 +24,7 @@ class DokuwikiCallsStyle {
     private $style;
 
     private $indexWidth;
+    private $offsetWidth;
     private $indexFormat;
     private $dataIndent;
     private $dataIndexFormat;
@@ -41,8 +42,9 @@ class DokuwikiCallsStyle {
     /**
      * Constructor
      */
-    public function __construct($callsCount) {
-        $this->indexWidth = strlen(strval($callsCount));
+    public function __construct($calls) {
+        $this->indexWidth = strlen(strval(count($calls)));
+        $this->offsetWidth = strlen(strval($calls[count($calls) - 1][2]));
 
         $this->set(array());
     }
@@ -67,10 +69,8 @@ class DokuwikiCallsStyle {
         $this->offsetAtEol = $this->has(self::OFFSET_AT_EOL);
         $this->offsetInIndex = $this->has(self::OFFSET_IN_INDEX);
 
-        $offsetWidth = strlen(strval($this->calls[count($this->calls) - 1][2]));
-
         if ($this->offsetInIndex) {
-            $this->indexFormat = '[%' . $this->indexWidth . 'd | %' . $offsetWidth . 'd] ';
+            $this->indexFormat = '[%' . $this->indexWidth . 'd | %' . $this->offsetWidth . 'd] ';
         }
         else {
             $this->indexFormat = '[%' . $this->indexWidth . 'd] ';
@@ -80,7 +80,7 @@ class DokuwikiCallsStyle {
             $dataIndent = 4;
         }
         else {
-            $dataIndent = $this->indexWidth + ($this->offsetInIndex ? $offsetWidth + 6 : 3);
+            $dataIndent = $this->indexWidth + ($this->offsetInIndex ? $this->offsetWidth + 6 : 3);
         }
 
         $this->dataIndent = str_pad('', $dataIndent);

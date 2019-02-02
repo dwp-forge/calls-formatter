@@ -17,7 +17,6 @@ class DokuwikiCallsFormatter {
     private static $processorClasses = array();
 
     private $calls;
-    private $count;
     private $style;
     private $callFormatters;
     private $callProcessors;
@@ -49,8 +48,7 @@ class DokuwikiCallsFormatter {
      */
     public function __construct($calls) {
         $this->calls = $calls;
-        $this->count = count($this->calls);
-        $this->style = new DokuwikiCallsStyle($this->count);
+        $this->style = new DokuwikiCallsStyle($calls);
         $this->callFormatters = new DokuwikiModeHandlerFactory(self::$formatterClasses, 'DokuwikiGenericCallFormatter', $this->style);
         $this->callProcessors = new DokuwikiModeHandlerFactory(self::$processorClasses, 'DokuwikiGenericCallProcessor', $this->style);
     }
@@ -83,8 +81,9 @@ class DokuwikiCallsFormatter {
         }
 
         $output = $this->style->has(DokuwikiCallsStyle::START_WITH_NEW_LINE) ? "\n" : '';
+        $count = count($this->calls);
 
-        for ($index = 0; $index < $this->count; $index += $progress) {
+        for ($index = 0; $index < $count; $index += $progress) {
             list($call, $progress) = $this->getCall($index);
 
             if (!$this->style->getHideIndex()) {
