@@ -65,8 +65,39 @@ class DokuwikiHeaderCallFormatter extends DokuwikiGenericCallFormatter {
     }
 }
 
+class DokuwikiPCdataCallFormatter extends DokuwikiCdataCallFormatter {
+    /**
+     *
+     */
+    public function format($call) {
+        $output = parent::format($call);
+
+        if ($this->style->getEmptyLineAfterParagraph()) {
+            $output .= "\n";
+        }
+
+        return $output;
+    }
+}
+
+class DokuwikiPCloseCallFormatter extends DokuwikiGenericCallFormatter {
+    /**
+     *
+     */
+    public function format($call) {
+        $output = parent::format($call);
+
+        if ($this->style->getEmptyLineAfterParagraph()) {
+            $output .= "\n";
+        }
+
+        return $output;
+    }
+}
+
 DokuwikiCallsFormatter::registerProcessor('p_open', 'DokuwikiPopenCallProcessor');
 
 DokuwikiCallsFormatter::registerFormatter('cdata', 'DokuwikiCdataCallFormatter');
 DokuwikiCallsFormatter::registerFormatter('header', 'DokuwikiHeaderCallFormatter');
-DokuwikiCallsFormatter::registerFormatter('p_cdata', 'DokuwikiCdataCallFormatter');
+DokuwikiCallsFormatter::registerFormatter('p_cdata', 'DokuwikiPCdataCallFormatter');
+DokuwikiCallsFormatter::registerFormatter('p_close', 'DokuwikiPCloseCallFormatter');

@@ -126,8 +126,7 @@ function format_calls($calls) {
     $formatter = new DokuwikiCallsFormatter($calls);
 
     return $formatter->format(
-        DokuwikiCallsStyle::START_WITH_NEW_LINE,
-        DokuwikiCallsStyle::COLLAPSE_DATA_PARAGRAPHS,
-        DokuwikiCallsStyle::COMPACT_DATA
-    );
+            DokuwikiCallsStyle::START_WITH_NEW_LINE,
+            DokuwikiCallsStyle::COLLAPSE_DATA_PARAGRAPHS,
+            DokuwikiCallsStyle::COMPACT_DATA);
 }

@@ -11,6 +11,7 @@ class DokuwikiCallsStyle {
 
     const COLLAPSE_DATA_PARAGRAPHS = 0x98f1f81d;
     const COMPACT_DATA = 0x6724fd87;
+    const EMPTY_LINE_AFTER_PARAGRAPH = 0x291d79e0;
     const INLINE_DATA = 0x0345846a;
     const HIDE_DATA = 0x5a213f13;
     const HIDE_INDEX = 0xebefe439;
@@ -32,6 +33,7 @@ class DokuwikiCallsStyle {
 
     private $collapseDataParagraphs;
     private $compactData;
+    private $emptyLineAfterParagraph;
     private $inlineData;
     private $hideData;
     private $hideIndex;
@@ -62,6 +64,7 @@ class DokuwikiCallsStyle {
         $this->style = $style;
         $this->collapseDataParagraphs = $this->has(self::COLLAPSE_DATA_PARAGRAPHS);
         $this->compactData = $this->has(self::COMPACT_DATA) || $this->has(self::INLINE_DATA);
+        $this->emptyLineAfterParagraph = $this->has(self::EMPTY_LINE_AFTER_PARAGRAPH);
         $this->inlineData = $this->has(self::INLINE_DATA);
         $this->hideData = $this->has(self::HIDE_DATA);
         $this->hideIndex = $this->has(self::HIDE_INDEX);
@@ -142,6 +145,13 @@ class DokuwikiCallsStyle {
      */
     public function getCompactData() {
         return $this->compactData;
+    }
+
+    /**
+     *
+     */
+    public function getEmptyLineAfterParagraph() {
+        return $this->emptyLineAfterParagraph;
     }
 
     /**
