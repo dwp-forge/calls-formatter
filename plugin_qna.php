@@ -47,7 +47,7 @@ class DokuwikiQnaBlockCallFormatter extends DokuwikiGenericCallFormatter {
     private function formatOpenQuestionData($call) {
         $maxTitleLength = $this->style->getInlineData() ? 40 : 80;
 
-        return $this->formatStringCompact($call[1], $maxTitleLength) . $this->style->getDataSeparator() .
+        return $this->formatString($call[1], $maxTitleLength) . $this->style->getDataSeparator() .
             'id = ' . $call[2];
     }
 }

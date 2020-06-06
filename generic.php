@@ -108,11 +108,7 @@ class DokuwikiGenericCallFormatter {
             $data .= "\n";
         }
         else {
-            foreach ($call[1] as $index => $value) {
-                $data .= sprintf($this->style->getDataIndexFormat(), $index);
-                $data .= str_replace("\n", "\n" . $this->style->getDataIndent(), rtrim(print_r($value, true)));
-                $data .= "\n";
-            }
+            $data .= $this->formatArray($call[1], $this->style->getDataIndent());
         }
 
         return $data;
@@ -123,7 +119,7 @@ class DokuwikiGenericCallFormatter {
      */
     protected function formatValueCompact($value) {
         if (is_string($value)) {
-            return $this->formatStringCompact($value);
+            return $this->formatString($value, DokuwikiCallsStyle::MAX_COMPACT_STRING_LENGTH);
         }
         else if (is_array($value)) {
             return '{' . $this->formatArrayCompact($value) . '}';
@@ -135,7 +131,39 @@ class DokuwikiGenericCallFormatter {
     /**
      *
      */
-    protected function formatStringCompact($string, $maxLength = DokuwikiCallsStyle::MAX_COMPACT_STRING_LENGTH) {
+    protected function formatArrayCompact($array) {
+        $output = '';
+
+        foreach ($array as $key => $value) {
+            if (!empty($output)) {
+                $output .= ', ';
+            }
+
+            $output .= "[$key] => ";
+            $output .= $this->formatValueCompact($value);
+        }
+
+        return $output;
+    }
+
+    /**
+     *
+     */
+    protected function formatValue($value, $indent) {
+        if (is_string($value)) {
+            return $this->formatString($value, DokuwikiCallsStyle::MAX_STRING_LENGTH);
+        }
+        else if (is_array($value)) {
+            return "Array:\n" . rtrim($this->formatArray($value, $indent . '    '));
+        }
+
+        return strval($value);
+    }
+
+    /**
+     *
+     */
+    protected function formatString($string, $maxLength) {
         $output = trim(str_replace("\n", '\n', $string));
 
         if (strlen($output) > $maxLength) {
@@ -148,20 +176,12 @@ class DokuwikiGenericCallFormatter {
     /**
      *
      */
-    protected function formatArrayCompact($array) {
+    protected function formatArray($array, $indent) {
         $output = '';
-        $first = true;
 
         foreach ($array as $key => $value) {
-            if ($first) {
-                $first = false;
-            }
-            else {
-                $output .= ', ';
-            }
-
-            $output .= "[$key] => ";
-            $output .= $this->formatValueCompact($value);
+            $output .= $indent . "[$key] => ";
+            $output .= $this->formatValue($value, $indent) . "\n";
         }
 
         return $output;

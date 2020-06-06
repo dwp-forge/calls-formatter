@@ -35,10 +35,10 @@ class DokuwikiCdataCallFormatter extends DokuwikiGenericCallFormatter {
      */
     protected function formatCallData($call) {
         if ($this->style->getInlineData()) {
-            return ' ' . $this->formatStringCompact($call[1][0], 50);
+            return ' ' . $this->formatString($call[1][0], 50);
         }
 
-        return $this->style->getDataIndent() . $this->formatStringCompact($call[1][0], 80) . "\n";
+        return $this->style->getDataIndent() . $this->formatString($call[1][0], 80) . "\n";
     }
 }
 
@@ -60,7 +60,7 @@ class DokuwikiHeaderCallFormatter extends DokuwikiGenericCallFormatter {
     private function formatData($call) {
         $maxTitleLength = $this->style->getInlineData() ? 40 : 80;
 
-        return $this->formatStringCompact($call[1][0], $maxTitleLength) . $this->style->getDataSeparator() .
+        return $this->formatString($call[1][0], $maxTitleLength) . $this->style->getDataSeparator() .
             'level = ' . $call[1][1];
     }
 }

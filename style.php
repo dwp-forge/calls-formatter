@@ -21,6 +21,7 @@ class DokuwikiCallsStyle {
     const START_WITH_NEW_LINE = 0x2e0a6907;
 
     const MAX_COMPACT_STRING_LENGTH = 30;
+    const MAX_STRING_LENGTH = 80;
 
     private $style;
 
@@ -28,7 +29,6 @@ class DokuwikiCallsStyle {
     private $offsetWidth;
     private $indexFormat;
     private $dataIndent;
-    private $dataIndexFormat;
     private $dataSeparator;
 
     private $collapseDataParagraphs;
@@ -87,7 +87,6 @@ class DokuwikiCallsStyle {
         }
 
         $this->dataIndent = str_pad('', $dataIndent);
-        $this->dataIndexFormat = $this->dataIndent . '[%d] => ';
         $this->dataSeparator = $this->compactData ? ', ' : "\n" . $this->dataIndent;
     }
 
@@ -117,13 +116,6 @@ class DokuwikiCallsStyle {
      */
     public function getDataIndent() {
         return $this->dataIndent;
-    }
-
-    /**
-     *
-     */
-    public function getDataIndexFormat() {
-        return $this->dataIndexFormat;
     }
 
     /**
