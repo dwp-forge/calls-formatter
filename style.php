@@ -9,6 +9,7 @@
 
 class DokuwikiCallsStyle {
 
+    const COLLAPSE_DATA_FORMATTING = 0xdc8ae240;
     const COLLAPSE_DATA_PARAGRAPHS = 0x98f1f81d;
     const COMPACT_DATA = 0x6724fd87;
     const EMPTY_LINE_AFTER_PARAGRAPH = 0x291d79e0;
@@ -31,6 +32,7 @@ class DokuwikiCallsStyle {
     private $dataIndent;
     private $dataSeparator;
 
+    private $collapseDataFormatting;
     private $collapseDataParagraphs;
     private $compactData;
     private $emptyLineAfterParagraph;
@@ -62,6 +64,7 @@ class DokuwikiCallsStyle {
         }
 
         $this->style = $style;
+        $this->collapseDataFormatting = $this->has(self::COLLAPSE_DATA_FORMATTING);
         $this->collapseDataParagraphs = $this->has(self::COLLAPSE_DATA_PARAGRAPHS);
         $this->compactData = $this->has(self::COMPACT_DATA) || $this->has(self::INLINE_DATA);
         $this->emptyLineAfterParagraph = $this->has(self::EMPTY_LINE_AFTER_PARAGRAPH);
@@ -123,6 +126,13 @@ class DokuwikiCallsStyle {
      */
     public function getDataSeparator() {
         return $this->dataSeparator;
+    }
+
+    /**
+     *
+     */
+    public function getCollapseDataFormatting() {
+        return $this->collapseDataFormatting;
     }
 
     /**
